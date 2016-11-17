@@ -1,25 +1,31 @@
 /**
-@file   bind.hpp
-@brief  提供了"bind"這個實用的函式綁定工具
-@author ToyAuthor
-<pre>
-通常能用bind取代繼承的場合就別用繼承了
-記得去查一下佔位符這個bind的重要功能
+ * @file      bind.hpp
+ * @brief     提供了 std::bind 這個實用的函式綁定工具
+ * @author    ToyAuthor
+ * @copyright Public Domain
+ * <pre>
+ * 通常能用 bind 取代繼承的場合就別用繼承了
+ *
+ * bind的實作方式用到許多樣版手法
+ * 假如你平時很少使用樣版的話
+ * 建議不要去研究 bind 了
+ * 而且 std::bind 在 C++11 之後大概會漸漸被更強大的匿名函式取代
+ *
+ * 厲害的樣板技巧基本上都有人打造成方便的工具供你使用了
+ * 會用就可以了
+ * 不用搞懂內容
+ *
+ * http://github.com/ToyAuthor/functional
+ * </pre>
+ */
 
-假如看不懂內容如何實現的話就別看了
-真的很難派上用場
-厲害的樣板技巧基本上都有人打造成方便的工具供你使用了
-http://github.com/ToyAuthor/functional
-</pre>
-*/
 
 #ifndef _STD_BIND_HPP_
 #define _STD_BIND_HPP_
 
-// 判斷編譯器是否為C++11，是就改用標準庫的內容吧
+// 判斷編譯器是否為C++11，是就改用標準庫吧
 #if __cplusplus > 201100L
 
-// C++11沒有<bind>
 #include <functional>
 
 #else

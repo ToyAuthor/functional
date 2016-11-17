@@ -1,26 +1,23 @@
 /**
-@file   functional.hpp
-@brief  提供了"function"這種可以儲存函式的物件
-@author ToyAuthor
-<pre>
-function可以儲存一般函式也可以儲存成員函式
-儲存成員函式時要搭配bind()使用
-
-由於這東西的實現完全是我自己想的
-效率提升空間應該還很大
-http://github.com/ToyAuthor/functional
-</pre>
-*/
+ * @file      functional.hpp
+ * @brief     提供了 std::function 這種可以儲存函式的物件
+ * @author    ToyAuthor
+ * @copyright Public Domain
+ * <pre>
+ * 用法參考 boost::function 就可以了
+ *
+ * http://github.com/ToyAuthor/functional
+ * </pre>
+ */
 
 
 #ifndef _STD_FUNCTIONAL_HPP_
 #define _STD_FUNCTIONAL_HPP_
 
 
-// 判斷編譯器是否為C++11，是就改用標準庫的內容吧
+// 判斷編譯器是否為C++11，是就改用標準庫吧
 #if __cplusplus > 201100L
 
-// C++11標準庫的std::function
 #include <functional>
 
 #else

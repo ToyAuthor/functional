@@ -7,8 +7,7 @@ It's unprotected and simple.
 但又不想採用boost也不想改用C++11編譯器  
 那麼試試這個版本吧  
 
-### License
-Unlicense  
+### Unlicense
 Public domain  
 完全自由使用  
 
