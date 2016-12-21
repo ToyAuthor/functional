@@ -1,10 +1,10 @@
 /**
  * @file      functional.hpp
- * @brief     提供了 std::function 這種可以儲存函式的物件
+ * @brief     實作 std::function 的簡易版
  * @author    ToyAuthor
  * @copyright Public Domain
  * <pre>
- * 用法參考 boost::function 就可以了
+ * 用法參考 std::function 或 boost::function 都可以
  *
  * http://github.com/ToyAuthor/functional
  * </pre>
@@ -156,6 +156,16 @@ template<typename R, typename S> struct function_base
 {
 	function_base():pCore(0){}
 	~function_base(){delete pCore;}
+
+	operator bool () const
+	{
+		if ( pCore )
+		{
+			return true;
+		}
+
+		return false;
+	}
 
 	_functional::core_base<R,S>     *pCore;     // 外部使用者不該修改此指標，該老慮要不要"protected"起來了
 
@@ -513,11 +523,315 @@ struct function<R(P1, P2, P3, P4)> : function_base<R, storage4<P1, P2, P3, P4> >
 	}
 };
 
+/// function的五個參數版本
+template<typename R, typename P1, typename P2, typename P3, typename P4, typename P5>
+struct function<R(P1, P2, P3, P4, P5)> : function_base<R, storage5<P1, P2, P3, P4, P5> >
+{
+	typedef R (*Fn)(P1,P2,P3,P4,P5);
+	typedef storage5<P1,P2,P3,P4,P5> St;
+	using function_base<R,St>::pCore;
+
+	function(){}
+	function(Fn f)
+	{
+		pCore = new _functional::core_function<R, St, Fn>(f);
+	}
+	function operator=(Fn f)
+	{
+		delete pCore;
+		pCore = new _functional::core_function<R, St, Fn>(f);
+		return *this;
+	}
+
+	template<typename C>
+	function(R(C::*f)(P1,P2,P3,P4,P5))
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5),C> F;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+	}
+	template<typename C>
+	function(R(C::*f)(P1,P2,P3,P4,P5),C* c)
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5),C> F;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+		pCore->SetObject((void*)(c));
+	}
+	template<typename C>
+	function operator=(R(C::*f)(P1,P2,P3,P4,P5))
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5),C> F;
+		delete pCore;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+		return *this;
+	}
+
+	template<typename A,typename B,typename C>
+	function(const bind_t<A,B,C> &b)
+	{
+		pCore = new _functional::core_bind<bind_t<A,B,C>, St >(b);
+	}
+	template<typename A,typename B,typename C>
+	function operator=(const bind_t<A,B,C> &b)
+	{
+		delete pCore;
+		pCore = new _functional::core_bind<bind_t<A,B,C>, St >(b);
+		return *this;
+	}
+
+	R operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) const
+	{
+		return pCore->CallFunction(St(p1, p2, p3, p4, p5));
+	}
+};
+
+/// function的六個參數版本
+template<typename R, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6>
+struct function<R(P1, P2, P3, P4, P5, P6)> : function_base<R, storage6<P1, P2, P3, P4, P5, P6> >
+{
+	typedef R (*Fn)(P1,P2,P3,P4,P5,P6);
+	typedef storage6<P1,P2,P3,P4,P5,P6> St;
+	using function_base<R,St>::pCore;
+
+	function(){}
+	function(Fn f)
+	{
+		pCore = new _functional::core_function<R, St, Fn>(f);
+	}
+	function operator=(Fn f)
+	{
+		delete pCore;
+		pCore = new _functional::core_function<R, St, Fn>(f);
+		return *this;
+	}
+
+	template<typename C>
+	function(R(C::*f)(P1,P2,P3,P4,P5,P6))
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6),C> F;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+	}
+	template<typename C>
+	function(R(C::*f)(P1,P2,P3,P4,P5,P6),C* c)
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6),C> F;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+		pCore->SetObject((void*)(c));
+	}
+	template<typename C>
+	function operator=(R(C::*f)(P1,P2,P3,P4,P5,P6))
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6),C> F;
+		delete pCore;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+		return *this;
+	}
+
+	template<typename A,typename B,typename C>
+	function(const bind_t<A,B,C> &b)
+	{
+		pCore = new _functional::core_bind<bind_t<A,B,C>, St >(b);
+	}
+	template<typename A,typename B,typename C>
+	function operator=(const bind_t<A,B,C> &b)
+	{
+		delete pCore;
+		pCore = new _functional::core_bind<bind_t<A,B,C>, St >(b);
+		return *this;
+	}
+
+	R operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) const
+	{
+		return pCore->CallFunction(St(p1, p2, p3, p4, p5, p6));
+	}
+};
+
+/// function的七個參數版本
+template<typename R, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7>
+struct function<R(P1, P2, P3, P4, P5, P6, P7)> : function_base<R, storage7<P1, P2, P3, P4, P5, P6, P7> >
+{
+	typedef R (*Fn)(P1,P2,P3,P4,P5,P6,P7);
+	typedef storage7<P1,P2,P3,P4,P5,P6,P7> St;
+	using function_base<R,St>::pCore;
+
+	function(){}
+	function(Fn f)
+	{
+		pCore = new _functional::core_function<R, St, Fn>(f);
+	}
+	function operator=(Fn f)
+	{
+		delete pCore;
+		pCore = new _functional::core_function<R, St, Fn>(f);
+		return *this;
+	}
+
+	template<typename C>
+	function(R(C::*f)(P1,P2,P3,P4,P5,P6,P7))
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6,P7),C> F;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+	}
+	template<typename C>
+	function(R(C::*f)(P1,P2,P3,P4,P5,P6,P7),C* c)
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6,P7),C> F;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+		pCore->SetObject((void*)(c));
+	}
+	template<typename C>
+	function operator=(R(C::*f)(P1,P2,P3,P4,P5,P6,P7))
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6,P7),C> F;
+		delete pCore;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+		return *this;
+	}
+
+	template<typename A,typename B,typename C>
+	function(const bind_t<A,B,C> &b)
+	{
+		pCore = new _functional::core_bind<bind_t<A,B,C>, St >(b);
+	}
+	template<typename A,typename B,typename C>
+	function operator=(const bind_t<A,B,C> &b)
+	{
+		delete pCore;
+		pCore = new _functional::core_bind<bind_t<A,B,C>, St >(b);
+		return *this;
+	}
+
+	R operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) const
+	{
+		return pCore->CallFunction(St(p1, p2, p3, p4, p5, p6, p7));
+	}
+};
+
+/// function的八個參數版本
+template<typename R, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8>
+struct function<R(P1, P2, P3, P4, P5, P6, P7, P8)> : function_base<R, storage8<P1, P2, P3, P4, P5, P6, P7, P8> >
+{
+	typedef R (*Fn)(P1,P2,P3,P4,P5,P6,P7,P8);
+	typedef storage8<P1,P2,P3,P4,P5,P6,P7,P8> St;
+	using function_base<R,St>::pCore;
+
+	function(){}
+	function(Fn f)
+	{
+		pCore = new _functional::core_function<R, St, Fn>(f);
+	}
+	function operator=(Fn f)
+	{
+		delete pCore;
+		pCore = new _functional::core_function<R, St, Fn>(f);
+		return *this;
+	}
+
+	template<typename C>
+	function(R(C::*f)(P1,P2,P3,P4,P5,P6,P7,P8))
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6,P7,P8),C> F;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+	}
+	template<typename C>
+	function(R(C::*f)(P1,P2,P3,P4,P5,P6,P7,P8),C* c)
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6,P7,P8),C> F;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+		pCore->SetObject((void*)(c));
+	}
+	template<typename C>
+	function operator=(R(C::*f)(P1,P2,P3,P4,P5,P6,P7,P8))
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6,P7,P8),C> F;
+		delete pCore;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+		return *this;
+	}
+
+	template<typename A,typename B,typename C>
+	function(const bind_t<A,B,C> &b)
+	{
+		pCore = new _functional::core_bind<bind_t<A,B,C>, St >(b);
+	}
+	template<typename A,typename B,typename C>
+	function operator=(const bind_t<A,B,C> &b)
+	{
+		delete pCore;
+		pCore = new _functional::core_bind<bind_t<A,B,C>, St >(b);
+		return *this;
+	}
+
+	R operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) const
+	{
+		return pCore->CallFunction(St(p1, p2, p3, p4, p5, p6, p7, p8));
+	}
+};
+
+/// function的九個參數版本
+template<typename R, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8, typename P9>
+struct function<R(P1, P2, P3, P4, P5, P6, P7, P8, P9)> : function_base<R, storage9<P1, P2, P3, P4, P5, P6, P7, P8, P9> >
+{
+	typedef R (*Fn)(P1,P2,P3,P4,P5,P6,P7,P8,P9);
+	typedef storage9<P1,P2,P3,P4,P5,P6,P7,P8,P9> St;
+	using function_base<R,St>::pCore;
+
+	function(){}
+	function(Fn f)
+	{
+		pCore = new _functional::core_function<R, St, Fn>(f);
+	}
+	function operator=(Fn f)
+	{
+		delete pCore;
+		pCore = new _functional::core_function<R, St, Fn>(f);
+		return *this;
+	}
+
+	template<typename C>
+	function(R(C::*f)(P1,P2,P3,P4,P5,P6,P7,P8,P9))
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6,P7,P8,P9),C> F;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+	}
+	template<typename C>
+	function(R(C::*f)(P1,P2,P3,P4,P5,P6,P7,P8,P9),C* c)
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6,P7,P8,P9),C> F;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+		pCore->SetObject((void*)(c));
+	}
+	template<typename C>
+	function operator=(R(C::*f)(P1,P2,P3,P4,P5,P6,P7,P8,P9))
+	{
+		typedef _functional::member_function<R,R (C::*)(P1,P2,P3,P4,P5,P6,P7,P8,P9),C> F;
+		delete pCore;
+		pCore = new _functional::core_member_function<R, St, F, C>(F(f));
+		return *this;
+	}
+
+	template<typename A,typename B,typename C>
+	function(const bind_t<A,B,C> &b)
+	{
+		pCore = new _functional::core_bind<bind_t<A,B,C>, St >(b);
+	}
+	template<typename A,typename B,typename C>
+	function operator=(const bind_t<A,B,C> &b)
+	{
+		delete pCore;
+		pCore = new _functional::core_bind<bind_t<A,B,C>, St >(b);
+		return *this;
+	}
+
+	R operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) const
+	{
+		return pCore->CallFunction(St(p1, p2, p3, p4, p5, p6, p7, p8, p9));
+	}
+};
+
 //---------------------------function類別們---------------------------end
 
 }//namespace std
 
 
 #endif//__cplusplus > 201100L
-
 #endif//_STD_FUNCTIONAL_HPP_
